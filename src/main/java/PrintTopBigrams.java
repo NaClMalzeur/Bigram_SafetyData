@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 public class PrintTopBigrams {
     /*
@@ -6,10 +7,8 @@ public class PrintTopBigrams {
     * Input : ArrayList<Bigram> : Liste des k bigrams à la significance la plus élevée.
     * Output : None
      */
-    public static void print (ArrayList<Bigram> topBigrams){
-        // Affichage de la liste par la fin, car le tri est inversé.
-        for(int i = topBigrams.size()-1; i >= 0; i--){
-            System.out.println(topBigrams.get(i).toString() + "\n");
-        }
+    public static void print (List<Bigram> topBigrams){
+        // Affichage de la liste
+        topBigrams.stream().forEach(System.out::println);
     }
 }

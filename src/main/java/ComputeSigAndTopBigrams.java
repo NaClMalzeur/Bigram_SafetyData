@@ -1,6 +1,6 @@
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ComputeSigAndTopBigrams {
     /*
@@ -14,32 +14,21 @@ public class ComputeSigAndTopBigrams {
     *         int : le nombre minimal d'apparition des bigrams pour qu'il soit une co-location
     *         int : le nombre de bigrams à afficher par le programme
      */
-    public static ArrayList<Bigram> compute(Map<String, Map<String, Bigram>> bigramMap,
+    public static List<Bigram> compute(Map<Bigram, Long> bigramMap,
                                             Map<String, Integer> everyWordCount,
-                                            int minCount,
+                                            Long minCount,
                                             int k){
-        ArrayList<Bigram> topBigrams = new ArrayList<Bigram>();
+        List<Bigram> topBigrams = new ArrayList<Bigram>();
+        System.out.println(bigramMap.size());
+        bigramMap = bigramMap.entrySet().stream()
+                .filter( x -> x.getValue() >= minCount).collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
+        bigramMap.entrySet().stream().forEach(x -> x.getKey().calcSignificance(x.getValue(),everyWordCount));
+        topBigrams = bigramMap.keySet().stream()
+                .sorted(Collections.reverseOrder(Comparator.comparing(Bigram::getSignificance)))
+                .limit(k)
+                .collect(Collectors.toList());
+        System.out.println(topBigrams.size());
 
-        long bigramsCount = 0;
-        for(Map.Entry<String, Map<String, Bigram>> entry : bigramMap.entrySet()){
-            for(Map.Entry<String, Bigram> bigram : entry.getValue().entrySet()){
-                bigram.getValue().calcSignificance(minCount, everyWordCount);
-                // Pour tous les k premiers bigrams apparaissant plus de minCount fois
-                if(bigramsCount < k &&
-                        bigram.getValue().isActive()){
-                    topBigrams.add(bigram.getValue());
-                    topBigrams.sort(Comparator.comparing(Bigram::getSignificance));
-                    bigramsCount++;
-                }else{
-                    if(bigram.getValue().isActive() &&
-                            topBigrams.get(0).getSignificance() < bigram.getValue().getSignificance()){
-                        topBigrams.remove(0);
-                        topBigrams.add(bigram.getValue());
-                        topBigrams.sort(Comparator.comparing(Bigram::getSignificance));
-                    }
-                }
-            }
-        }
 
         return topBigrams;
     }

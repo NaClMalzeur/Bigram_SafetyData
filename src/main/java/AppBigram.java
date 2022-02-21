@@ -25,7 +25,7 @@ public class AppBigram {
 
         // Demande du minCount
         System.out.println("Entrez le nombre minCount d'apparition minimale de bigrams (3 par defaut) : \n");
-        int minCount = 3;
+        long minCount = 3;
         input = scan.nextLine();
         if(input.matches("\\d+")){
             minCount = Integer.getInteger(input);
@@ -39,17 +39,18 @@ public class AppBigram {
         Map<String, Integer> everyWordCount = CountOfEveryWords.count(tableWords);
 
         // Creation et compte des bigrams à partir du tableau de mots
-        Map<String, Map<String, Bigram>> bigramMap = TabToBigramMap.createBigramMap(tableWords);
+        Map<Bigram, Long> bigramMap = TabToBigramMap.createBigramMap(tableWords);
 
 
         // Calcul de la significance de chacun des bigrams
 
-        ArrayList<Bigram> topBigrams = new ArrayList<Bigram>();
+        List<Bigram> topBigrams = new ArrayList<Bigram>();
         topBigrams = ComputeSigAndTopBigrams.compute(bigramMap, everyWordCount, minCount, k);
 
 
         // Affichage des top k bigrams co-location
         System.out.println("Voici les " + k + " bigrams de plus hautes significance : \n");
         PrintTopBigrams.print(topBigrams);
+
     }
 }

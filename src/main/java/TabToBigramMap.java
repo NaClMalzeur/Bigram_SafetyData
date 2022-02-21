@@ -1,5 +1,10 @@
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TabToBigramMap {
     /*
@@ -10,29 +15,24 @@ public class TabToBigramMap {
     * et qui y associera à chacun une seconde map, dont la clé sera le second mot d'un bigram. La valeur de cette map
     * sera un objet Bigram décrit dans la classe correspondante
      */
-    public static Map<String, Map<String, Bigram>> createBigramMap (String[] tableWords){
-        Map<String, Map<String, Bigram>> bigramMap = new HashMap<String, Map<String, Bigram>>();
+    public static Map<Bigram, Long>  createBigramMap (String[] tableWords){
+        Map<Bigram, Long> bigramMap = new HashMap<Bigram, Long>();
+        List<Bigram> bigramList = new ArrayList<Bigram>();
 
-        for(int i = 0; i < tableWords.length - 1; i++){
+        for(int i = 0; i < tableWords.length - 1; i++) {
             String motA = tableWords[i];
-            String motB = tableWords[i+1];
-            // Si le mot courant est déjà apparu dans le texte (est déjà contenu dans un Bigram)
-            if(bigramMap.containsKey(motA)) {
-                Map<String, Bigram> secondMap = bigramMap.get(motA);
-                // Si le bigram est déjà apparu dans le texte.
-                if(secondMap.containsKey(motB)){
-                    secondMap.get(motB).addCountBigram();
-                }else{
-                    Bigram bigramToAdd = new Bigram(motA,motB);
-                    secondMap.put(motB, bigramToAdd);
-                }
-            }else{
-                Map<String, Bigram> secondMapToAdd = new HashMap<String, Bigram>();
-                Bigram bigramToAdd = new Bigram(motA,motB);
-                secondMapToAdd.put(motB, bigramToAdd);
-                bigramMap.put(motA, secondMapToAdd);
-            }
+            String motB = tableWords[i + 1];
+            Bigram bg = new Bigram(motA,motB);
+            bigramList.add(bg);
         }
+
+        System.out.println("List size = " + bigramList.size());
+        bigramMap = bigramList.stream()
+                .collect(Collectors.groupingBy(
+                        Function.identity()
+                        , Collectors.counting() ));
+        System.out.println("Map size = " + bigramMap.size());
+        bigramMap.forEach((k, v) -> System.out.println("Key : " + k.toString() + ", Value : " + v));
 
         return bigramMap;
     }
